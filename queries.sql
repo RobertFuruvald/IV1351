@@ -1,5 +1,6 @@
 
 --number of lessons a certain month
+CREATE VIEW lesson_count_type AS
 SELECT
 	COUNT(*) as total,
 	COUNT(*) FILTER(WHERE price_id=1 or price_id=2 or price_id=3) as individual,
@@ -11,6 +12,7 @@ SELECT
 
 
 -- number of lessons per instructor
+CREATE VIEW lesson_count_instructor as
 SELECT 
 	public.person.first_name, public.person.last_name, public.instructor.instructor_id, 
 	COUNT(*) FILTER (WHERE EXTRACT(MONTH FROM lesson_date) = EXTRACT(MONTH FROM CURRENT_DATE)) as numoflessons 
@@ -22,6 +24,7 @@ SELECT
 	ORDER BY numoflessons ASC;
 
 --number of siblings
+CREATE VIEW number_of_siblings AS
 SELECT COUNT(student_id) as student_count, 
        CASE 
          WHEN siblings = 0 THEN 'No siblings'
@@ -36,7 +39,7 @@ GROUP BY siblings
 ORDER BY siblings;
 
 --ensambles for next week wiht available room left
-
+CREATE MATERIALIZED VIEW lessons_next_week AS
 SELECT lesson.lesson_date,genre.genre,group_lesson.max_students, COUNT(lesson_attendees.lesson_id) as enrolled,
   CASE 
     WHEN COUNT(student_id) = CAST(group_lesson.max_students as INT) THEN 'Full'
